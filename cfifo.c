@@ -24,8 +24,10 @@ struct fifo_t
 	pthread_mutex_init(&fifo.lock , NULL);\
 	for(i = 0 ; i < fifo_size - 1 ; i++)\
 	{\
+		nodes[i].pcm[0]= i+6;\
 		nodes[i].next = &nodes[i+1];\
 	}\
+	nodes[i].pcm[0]= 100;\
 	nodes[i].next = NULL;\
 	\
 	fifo.head = &nodes[0];\
@@ -59,7 +61,7 @@ int traverse(struct fifo_t * pfifo)
 	p =	pfifo->head;
 	while(p != NULL)
 	{
-		printf("p->pcm[0] : %x , head : %p, tail : %p \n",p->pcm[0] , pfifo->head , pfifo->tail);
+		printf("p->pcm[0] : %x , head : %p, tail : %p , next : %p\n",p->pcm[0] , pfifo->head , pfifo->tail , p->next);
 		p = p->next;
 	}
 }
@@ -95,12 +97,11 @@ struct node_t * out_fifo(struct fifo_t * pfifo)
 	p = pfifo->head;
 	if(p == NULL)
 	{
-		//pfifo->tail = NULL;
 		pthread_mutex_unlock(&pfifo->lock);
 		return NULL;
 	}
 	else
-		pfifo->head = p->next;
+		(NULL == (pfifo->head = p->next)) ? pfifo->tail = NULL : NULL  ;
 
 	pthread_mutex_unlock(&pfifo->lock);
 	return p;
@@ -126,8 +127,9 @@ int main()
 	int ret;
 
 	init_fifo(&pfifo,3);
+	traverse(pfifo);
 	for(i = 0 ; (a[i] = out_fifo(pfifo)) != NULL ; i++)
-		;
+		traverse(pfifo);
 #if 0
 	while(1)
 	{
@@ -146,8 +148,20 @@ int main()
 		traverse(pfifo);
 	}
 #endif
-	for( i= 2 ; -1 != in_fifo(pfifo , a[i]) ; i-- )
-		;
+	printf("+++++++++++++++++++\n");
+	for( i= 2 ; 0 <= i ; i --)
+	{
+		printf("tail %p ,head %p\n",pfifo->tail , pfifo->head);
+		in_fifo(pfifo , a[i]);
+		traverse(pfifo);
+	}
+	printf("----------------\n");
+	
+	for(i = 0 ; i < 3 ; i ++)
+	{
+		printf("a[i] : %p , a[i]->next %p , a[i]->pcm[0] %d \n",
+				a[i] , a[i]->next , a[i]->pcm[0]);
+	}
 
 	while((p = out_fifo(pfifo)) != NULL)
 		printf("p->buf[0] : %x\n",p->pcm[0]);
