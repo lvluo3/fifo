@@ -1,8 +1,7 @@
 #include <stdio.h>
-#include <pthread.h>
-
+#include "cfifo.h"
+#if 0
 #define FIFO_SIZE 16
-
 struct node_t
 {
 	char pcm[4096];
@@ -54,7 +53,7 @@ int __init_fifo(int fifo_size)
 	fifo.head = &nodes[0];
 	fifo.head = &nodes[FIFO_SIZE - 1];	
 }
-
+#endif
 int traverse(struct fifo_t * pfifo)
 {
 	struct node_t * p = NULL;
