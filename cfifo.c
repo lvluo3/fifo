@@ -126,8 +126,9 @@ int main()
 	int ret;
 
 	init_fifo(&pfifo,3);
-	//for(i = 0 ; (a[i] = out_fifo(pfifo)) != NULL ; i++)
-	//	;
+	for(i = 0 ; (a[i] = out_fifo(pfifo)) != NULL ; i++)
+		;
+#if 0
 	while(1)
 	{
 		printf("----------------\n");
@@ -144,9 +145,9 @@ int main()
 		ret = in_fifo(pfifo,a[i]);
 		traverse(pfifo);
 	}
-
-//	for( i= 2 ; -1 != in_fifo(pfifo , a[i]) ; i-- )
-//		;
+#endif
+	for( i= 2 ; -1 != in_fifo(pfifo , a[i]) ; i-- )
+		;
 
 	while((p = out_fifo(pfifo)) != NULL)
 		printf("p->buf[0] : %x\n",p->pcm[0]);
