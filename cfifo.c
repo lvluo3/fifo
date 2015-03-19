@@ -1,62 +1,18 @@
 #include <stdio.h>
 #include "cfifo.h"
-#if 0
-#define FIFO_SIZE 16
-struct node_t
+
+int init_empty_fifo(struct fifo_t ** ppfifo)
 {
-	char pcm[4096];
-	struct node_t * next;
-};
-
-struct fifo_t
-{
-	struct node_t * head;
-	struct node_t * tail;
-	pthread_mutex_t lock;
-};
-
-#define init_fifo(ppfifo , fifo_size) do{\
-	static struct node_t nodes[fifo_size];\
-	static struct fifo_t fifo;\
-	int i;\
-	\
-	pthread_mutex_init(&fifo.lock , NULL);\
-	for(i = 0 ; i < fifo_size - 1 ; i++)\
-	{\
-		nodes[i].pcm[0]= i+6;\
-		nodes[i].next = &nodes[i+1];\
-	}\
-	nodes[i].pcm[0]= 100;\
-	nodes[i].next = NULL;\
-	\
-	fifo.head = &nodes[0];\
-	fifo.tail = &nodes[fifo_size - 1];\
-	\
-	*ppfifo = &fifo;\
-}while(0)
-
-int __init_fifo(int fifo_size)
-{
-	static struct node_t nodes[FIFO_SIZE];
-	//static struct node_t nodes[fifo_size];
-
-	int i;
 	static struct fifo_t fifo;
 	pthread_mutex_init(&fifo.lock , NULL);
-	for(i = 0 ; i < FIFO_SIZE - 1 ; i++)
-	{
-		nodes[i].pcm[0]= i+6;
-		nodes[i].next = &nodes[i+1];
-	}
-	nodes[i].next = NULL;
+	*ppfifo = &fifo;
 
-	fifo.head = &nodes[0];
-	fifo.head = &nodes[FIFO_SIZE - 1];	
+	return 0;
 }
-#endif
+
 int traverse(struct fifo_t * pfifo)
 {
-	struct node_t * p = NULL;
+	struct pcm_node_t * p = NULL;
 	p =	pfifo->head;
 	while(p != NULL)
 	{
@@ -65,9 +21,9 @@ int traverse(struct fifo_t * pfifo)
 	}
 }
 
-int in_fifo(struct fifo_t * pfifo , struct node_t * pnode)
+int in_fifo(struct fifo_t * pfifo , struct pcm_node_t * pnode)
 {
-	struct node_t * p ;
+	struct pcm_node_t * p ;
 	if(pfifo == NULL || pnode == NULL)
 		return -1;
 
@@ -86,9 +42,9 @@ int in_fifo(struct fifo_t * pfifo , struct node_t * pnode)
 	return 0;
 }
 
-struct node_t * out_fifo(struct fifo_t * pfifo)
+struct pcm_node_t * out_fifo(struct fifo_t * pfifo)
 {
-	struct node_t * p ;
+	struct pcm_node_t * p ;
 	if(pfifo == NULL)
 		return NULL;
 
@@ -106,9 +62,9 @@ struct node_t * out_fifo(struct fifo_t * pfifo)
 	return p;
 }
 
-struct node_t * must_out(struct fifo_t * pfifo_mem , struct fifo_t * pfifo_data)
+struct pcm_node_t * must_out(struct fifo_t * pfifo_mem , struct fifo_t * pfifo_data)
 {
-	struct node_t * p ;
+	struct pcm_node_t * p ;
 	p = out_fifo(pfifo_mem);
 	if(p == NULL)
 		p = out_fifo(pfifo_data);
@@ -120,8 +76,8 @@ struct node_t * must_out(struct fifo_t * pfifo_mem , struct fifo_t * pfifo_data)
 int main()
 {
 	struct fifo_t * pfifo;
-	struct node_t * p;
-	struct node_t * a[3];
+	struct pcm_node_t * p;
+	struct pcm_node_t * a[3];
 	int i = 0;
 	int ret;
 
@@ -139,7 +95,6 @@ int main()
 			break;
 		i++;
 	}
-
 	for(i = 2 ; 0 <= i ; i--)
 	{
 		printf("+++++++++++++++++++\n");
@@ -155,15 +110,15 @@ int main()
 		traverse(pfifo);
 	}
 	printf("----------------\n");
-	
+
 	for(i = 0 ; i < 3 ; i ++)
 	{
-		printf("a[i] : %p , a[i]->next %p , a[i]->pcm[0] %d \n",
+		printf("a[i] : %p , a[i]->next %p , a[i]->pcm[0] %c \n",
 				a[i] , a[i]->next , a[i]->pcm[0]);
 	}
 
 	while((p = out_fifo(pfifo)) != NULL)
-		printf("p->buf[0] : %x\n",p->pcm[0]);
+		printf("p->buf[0] : %c\n",p->pcm[0]);
 
 
 	return 0;

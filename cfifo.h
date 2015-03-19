@@ -1,19 +1,19 @@
 #include "pthread.h"
-struct node_t
+struct pcm_node_t
 {
 	char pcm[4096];
-	struct node_t * next;
+	struct pcm_node_t * next;
 };
 
 struct fifo_t
 {
-	struct node_t * head;
-	struct node_t * tail;
+	struct pcm_node_t * head;
+	struct pcm_node_t * tail;
 	pthread_mutex_t lock;
 };
 
 #define init_fifo(ppfifo , fifo_size) do{\
-	static struct node_t nodes[fifo_size];\
+	static struct pcm_node_t nodes[fifo_size];\
 	static struct fifo_t fifo;\
 	int i;\
 	\
@@ -31,3 +31,8 @@ struct fifo_t
 	\
 	*ppfifo = &fifo;\
 }while(0)
+
+
+int init_empty_fifo(struct fifo_t ** ppfifo);
+int in_fifo(struct fifo_t * pfifo , struct pcm_node_t * pnode);
+struct pcm_node_t * out_fifo(struct fifo_t * pfifo);
