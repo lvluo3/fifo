@@ -1,13 +1,49 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "cfifo.h"
 
 int init_empty_fifo(struct fifo_t ** ppfifo)
 {
 	static struct fifo_t fifo;
 	pthread_mutex_init(&fifo.lock , NULL);
+
+	fifo.head = NULL;
+	fifo.tail = NULL;
+	fifo.nodes = NULL;
 	*ppfifo = &fifo;
 
 	return 0;
+}
+
+int init_fifo(struct fifo_t ** ppfifo , int fifo_size) 
+{
+	static struct fifo_t fifo;
+	int i;
+	struct pcm_node_t *  nodes = (struct pcm_node_t *)malloc(sizeof(struct pcm_node_t) * fifo_size);
+	
+	pthread_mutex_init(&fifo.lock , NULL);
+	for(i = 0 ; i < fifo_size - 1 ; i++)
+	{
+		nodes[i].next = &nodes[i+1];
+	}
+	nodes[i].next = NULL;
+	
+	fifo.head = &nodes[0];
+	fifo.tail = &nodes[fifo_size - 1];
+	
+	fifo.nodes = nodes;
+	*ppfifo = &fifo;
+
+	return 0;
+}
+
+int destroy_fifo(struct fifo_t * pfifo)
+{
+	if(pfifo->nodes != NULL)
+		free(pfifo->nodes);
+	pthread_mutex_destroy(&pfifo->lock);
+	pfifo->head = NULL;
+	pfifo->tail = NULL;
 }
 
 int traverse(struct fifo_t * pfifo)
@@ -73,53 +109,3 @@ struct pcm_node_t * must_out(struct fifo_t * pfifo_mem , struct fifo_t * pfifo_d
 	return p;
 }
 
-int main()
-{
-	struct fifo_t * pfifo;
-	struct pcm_node_t * p;
-	struct pcm_node_t * a[3];
-	int i = 0;
-	int ret;
-
-	init_fifo(&pfifo,3);
-	traverse(pfifo);
-	for(i = 0 ; (a[i] = out_fifo(pfifo)) != NULL ; i++)
-		traverse(pfifo);
-#if 0
-	while(1)
-	{
-		printf("----------------\n");
-		traverse(pfifo);
-		a[i] = out_fifo(pfifo);
-		if(NULL == a[i])
-			break;
-		i++;
-	}
-	for(i = 2 ; 0 <= i ; i--)
-	{
-		printf("+++++++++++++++++++\n");
-		ret = in_fifo(pfifo,a[i]);
-		traverse(pfifo);
-	}
-#endif
-	printf("+++++++++++++++++++\n");
-	for( i= 2 ; 0 <= i ; i --)
-	{
-		printf("tail %p ,head %p\n",pfifo->tail , pfifo->head);
-		in_fifo(pfifo , a[i]);
-		traverse(pfifo);
-	}
-	printf("----------------\n");
-
-	for(i = 0 ; i < 3 ; i ++)
-	{
-		printf("a[i] : %p , a[i]->next %p , a[i]->pcm[0] %c \n",
-				a[i] , a[i]->next , a[i]->pcm[0]);
-	}
-
-	while((p = out_fifo(pfifo)) != NULL)
-		printf("p->buf[0] : %c\n",p->pcm[0]);
-
-
-	return 0;
-}

@@ -1,0 +1,22 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+destroy_fifo	cfifo.c	/^int destroy_fifo(struct fifo_t * pfifo)$/;"	f
+fifo_t	cfifo.h	/^struct fifo_t$/;"	s
+head	cfifo.h	/^	struct pcm_node_t * head;$/;"	m	struct:fifo_t	typeref:struct:fifo_t::pcm_node_t
+in_fifo	cfifo.c	/^int in_fifo(struct fifo_t * pfifo , struct pcm_node_t * pnode)$/;"	f
+init_empty_fifo	cfifo.c	/^int init_empty_fifo(struct fifo_t ** ppfifo)$/;"	f
+init_fifo	cfifo.c	/^int init_fifo(struct fifo_t ** ppfifo , int fifo_size) $/;"	f
+lock	cfifo.h	/^	pthread_mutex_t		lock;$/;"	m	struct:fifo_t
+main	main.c	/^int main()$/;"	f
+must_out	cfifo.c	/^struct pcm_node_t * must_out(struct fifo_t * pfifo_mem , struct fifo_t * pfifo_data)$/;"	f
+next	cfifo.h	/^	struct pcm_node_t * next;$/;"	m	struct:pcm_node_t	typeref:struct:pcm_node_t::pcm_node_t
+nodes	cfifo.h	/^	struct pcm_node_t * nodes;$/;"	m	struct:fifo_t	typeref:struct:fifo_t::pcm_node_t
+out_fifo	cfifo.c	/^struct pcm_node_t * out_fifo(struct fifo_t * pfifo)$/;"	f
+pcm	cfifo.h	/^	char pcm[4096];$/;"	m	struct:pcm_node_t
+pcm_node_t	cfifo.h	/^struct pcm_node_t$/;"	s
+tail	cfifo.h	/^	struct pcm_node_t * tail;$/;"	m	struct:fifo_t	typeref:struct:fifo_t::pcm_node_t
+traverse	cfifo.c	/^int traverse(struct fifo_t * pfifo)$/;"	f
